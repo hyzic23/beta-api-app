@@ -1,12 +1,27 @@
 import { NextResponse } from "next/server";
 import { loginSchema } from "./schema";
 import { LoginResponse, ErrorResponse } from "./auth";
+import { createToken } from "@/src/lib/authorization" // Import the createToken function from auth.ts
 import * as z from "zod";
 
 // Dummy user data for demonstration purposes
 const DUMMY_USERS = [
-    { id: 1, username: "john_doe", password: "password1", email: "johndoe@example.com", name: "John Doe", role: "admin" as const },
-    { id: 2, username: "demo_user", password: "password2", email: "demouser@example.com", name: "Demo User", role: "user" as const },
+    {
+        id: 1, username:
+        "john_doe",
+        password: "password1",
+        email: "johndoe@example.com",
+        name: "John Doe",
+        role: "admin" as const
+    },
+    {
+        id: 2,
+        username: "demo_user",
+        password: "password2",
+        email: "demouser@example.com",
+        name: "Demo User",
+        role: "user" as const
+    },
 ];
 
 export async function POST(request: Request) {
@@ -24,7 +39,6 @@ export async function POST(request: Request) {
                 },
                 { status: 400 }
             );
-
         }
 
         const { username, password } = result.data; // Extract validated data
@@ -42,6 +56,13 @@ export async function POST(request: Request) {
             );
         }
 
+        // Generate JWT token for the authenticated user
+        const token = await createToken({
+            userId: user.id.toString(),
+            email: user.email,
+            role: user.role
+        });
+
         // Return user data (excluding password) on successful login
         // NOTE = The _ is used to exclude the password from the user object in the response. This is a common practice to avoid sending sensitive information back to the client.
         const { password: _, ...userData } = user; // Exclude password from the response
@@ -49,7 +70,7 @@ export async function POST(request: Request) {
         return NextResponse.json<LoginResponse>(
             {
                 message: 'Login successful.',
-                token: 'dummy-jwt-token-xyz789', // Replace with real JWT sign logic in production
+                token,  // Return Bearer token to client
                 //...userData,
                 user: userData
             },
