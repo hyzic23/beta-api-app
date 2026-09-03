@@ -6,10 +6,10 @@ export interface LoginRequest {
 
 // User object returned after successful login
 export interface UserProfile {
-    id: string;
+    id: number;
     username: string;
     email: string;
-    role: 'admin' | 'user' | 'guest';
+    role: "admin" | "user" | "guest";
 }
 
 // API Response models

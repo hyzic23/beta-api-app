@@ -1,0 +1,65 @@
+import { NextResponse } from "next/server";
+import { loginSchema } from "./schema";
+import { LoginResponse, ErrorResponse } from "./auth";
+import * as z from "zod";
+
+// Dummy user data for demonstration purposes
+const DUMMY_USERS = [
+    { id: 1, username: "john_doe", password: "password1", email: "johndoe@example.com", name: "John Doe", role: "admin" as const },
+    { id: 2, username: "demo_user", password: "password2", email: "demouser@example.com", name: "Demo User", role: "user" as const },
+];
+
+export async function POST(request: Request) {
+    try{
+        // Validate the request body against the schema
+        const result = loginSchema.safeParse(await request.json());
+
+        if (!result.success) {
+            const errors = z.flattenError(result.error).fieldErrors; // Use flattenError to get a more structured error object
+
+            return NextResponse.json<ErrorResponse>(
+                {
+                    message: 'Invalid request data.', // Validation error message
+                    errors: errors
+                },
+                { status: 400 }
+            );
+
+        }
+
+        const { username, password } = result.data; // Extract validated data
+
+        // Find the user in the dummy data
+        const user = DUMMY_USERS.find(
+            (user) => user.username === username && user.password === password
+        );
+
+        // Check if the user exists and return appropriate response
+        if (!user) {
+            return NextResponse.json<ErrorResponse>(
+                { message: 'Invalid credentials.' },
+                { status: 401 }
+            );
+        }
+
+        // Return user data (excluding password) on successful login
+        // NOTE = The _ is used to exclude the password from the user object in the response. This is a common practice to avoid sending sensitive information back to the client.
+        const { password: _, ...userData } = user; // Exclude password from the response
+
+        return NextResponse.json<LoginResponse>(
+            {
+                message: 'Login successful.',
+                token: 'dummy-jwt-token-xyz789', // Replace with real JWT sign logic in production
+                //...userData,
+                user: userData
+            },
+            { status: 200 }
+        );
+
+    } catch (error) {
+        return NextResponse.json<ErrorResponse>(
+            { message: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
