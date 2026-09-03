@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 // Dummy user data for demonstration purposes
 const DUMMY_USERS = [
-  { id: 1, username: "john_doe", password: "password1", email: "johndoe@example.com", name: "John Doe", role: "admin" },
-  { id: 2, username: "demo_user", password: "password2", email: "demouser@example.com", name: "Demo User", role: "user" },
+    { id: 1, username: "john_doe", password: "password1", email: "johndoe@example.com", name: "John Doe", role: "admin" },
+    { id: 2, username: "demo_user", password: "password2", email: "demouser@example.com", name: "Demo User", role: "user" },
 ];
 
 export async function POST(request) {
