@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthorized } from "@/src/lib/authorization"; // Import the verifyAuth and isAuthorized functions
 
 // Dummy user database (shared structure)
 const DUMMY_USERS = [
@@ -26,6 +27,16 @@ interface Context {
 
 export async function GET(request: Request, context: Context) {
     try{
+        // Validate the JWT token from the request
+        const authUser = await verifyAuth(request);
+
+        if (!authUser) {
+            return NextResponse.json(
+                { message: 'Unauthorized: Invalid or missing token' },
+                { status: 401 }
+            );
+        }
+
         //Await the params from the context
         const { id } = await context.params;
 
