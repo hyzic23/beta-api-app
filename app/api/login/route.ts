@@ -3,6 +3,7 @@ import { loginSchema } from "./schema";
 import { LoginResponse, ErrorResponse } from "./auth";
 import { createToken } from "@/src/lib/authorization" // Import the createToken function from auth.ts
 import * as z from "zod";
+import { logger } from "@/src/utils/logger";
 
 // Dummy user data for demonstration purposes
 const DUMMY_USERS = [
@@ -26,8 +27,8 @@ const DUMMY_USERS = [
 
 export async function POST(request: Request) {
     try{
-        // Validate the request body against the schema
         const result = loginSchema.safeParse(await request.json());
+        logger.info('Login request payload: ', { result });
 
         if (!result.success) {
             const errors = z.flattenError(result.error).fieldErrors; // Use flattenError to get a more structured error object
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
         );
 
     } catch (error) {
+        //logger.error('Login failed with internal error', { error });
         return NextResponse.json<ErrorResponse>(
             { message: 'Internal server error' },
             { status: 500 }
