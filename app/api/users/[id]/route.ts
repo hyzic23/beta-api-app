@@ -25,6 +25,21 @@ interface Context {
     }>;
 }
 
+// export async function GET(request: Request) {
+//   // Read verified user metadata attached by middleware
+//     const userId = request.headers.get('x-user-id');
+//     const userRole = request.headers.get('x-user-role');
+
+//     console.log('Request Body from middleware:', request.body);
+//     console.log('User ID from middleware:', userId);
+//     console.log('User Role from middleware:', userRole);
+
+//     return NextResponse.json({
+//         message: 'Access granted by middleware',
+//         authenticatedUser: { userId, userRole },
+//     });
+// }
+
 export async function GET(request: Request, context: Context) {
     try{
         // Validate the JWT token from the request
